@@ -21,6 +21,9 @@ type Config struct {
 	IsVerboseLog           bool            `env:"verbose,required"`
 }
 
+// success is true if the build is successful, false otherwise.
+var success = os.Getenv("BITRISE_BUILD_STATUS") == "0"
+
 func failf(s string, a ...interface{}) {
 	log.Errorf(s, a...)
 	os.Exit(1)
@@ -38,7 +41,8 @@ func main() {
 	log.SetEnableDebugLog(cfg.IsVerboseLog)
 
 	app := bitrise.NewAppWithDefaultURL(cfg.AppSlug, string(cfg.AccessToken))
-
+	log.Infof("Current Builds Status: %s", success)
+	
 	log.Infof("Waiting for builds:")
 
 	buildSlugs := strings.Split(cfg.BuildSlugs, "\n")
@@ -62,7 +66,7 @@ func main() {
 			failReason = "cancelled"
 		}
 
-		if cfg.AbortBuildsOnFail == "yes" && build.Status > 1 {
+		if cfg.AbortBuildsOnFail == "yes" && (build.Status > 1 || os.Getenv("BITRISE_BUILD_STATUS") == "0") {
 			for _, buildSlug := range buildSlugs {
 				if buildSlug != build.Slug {
 					abortErr := app.AbortBuild(buildSlug, "Abort on Fail - Build [https://app.bitrise.io/build/"+build.Slug+"] "+failReason+"\nAuto aborted by parent build")
