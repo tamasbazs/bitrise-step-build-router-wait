@@ -66,7 +66,7 @@ func main() {
 			failReason = "cancelled"
 		}
 
-		if cfg.AbortBuildsOnFail == "yes" && (build.Status > 1 || success) {
+		if cfg.AbortBuildsOnFail == "yes" && (build.Status > 1 || os.Getenv("BITRISE_BUILD_STATUS") == "0") {
 			for _, buildSlug := range buildSlugs {
 				if buildSlug != build.Slug {
 					abortErr := app.AbortBuild(buildSlug, "Abort on Fail - Build [https://app.bitrise.io/build/"+build.Slug+"] "+failReason+"\nAuto aborted by parent build")
