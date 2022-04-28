@@ -41,7 +41,8 @@ func main() {
 	log.SetEnableDebugLog(cfg.IsVerboseLog)
 
 	app := bitrise.NewAppWithDefaultURL(cfg.AppSlug, string(cfg.AccessToken))
-
+	log.Infof("Current Builds Status: %s", success)
+	
 	log.Infof("Waiting for builds:")
 
 	buildSlugs := strings.Split(cfg.BuildSlugs, "\n")
